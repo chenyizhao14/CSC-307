@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 
 const app = express();
 const port = 8000;
@@ -64,6 +65,7 @@ app.listen(port, () => {
 	);
 });
 
+app.use(cors());
 app.use(express.json());
 
 app.get("/users/:id", (req, res) => {
@@ -92,18 +94,6 @@ app.get("/users", (req, res) => {
 	}
 });
 
-// app.get("/users", (req, res) => {
-// 	const name = req.query.name;
-// 	if (name != undefined) {
-// 	  let result = findUserByName(name);
-// 	  result = { users_list: result };
-// 	  res.send(result);
-// 	} else {
-// 	  res.send(users);
-// 	}
-//   });
-
- 
 app.post("/users", (req, res) => {
 	const userToAdd = req.body;
 	addUser(userToAdd);
