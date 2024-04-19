@@ -58,6 +58,18 @@ const findUserByNameJob = (name, job) => {
 const findUserById = (id) =>
 	users["users_list"].find((user) => user["id"] === id);
 
+// generate ID on server
+const generateId = () => {
+	const chars = "abcdefghijklmnopqrstuvwxyz";
+	let result = "";
+	for (let i = 0; i < 3; i++) {
+		result += chars.charAt(Math.floor(Math.random() * chars.length));
+	}
+	let num = Math.floor(Math.random() * 1000).toString();
+	result += num;
+	return result;
+}
+
 
 app.listen(port, () => {
 	console.log(
@@ -96,7 +108,13 @@ app.get("/users", (req, res) => {
 
 app.post("/users", (req, res) => {
 	const userToAdd = req.body;
+	if (!("id" in userToAdd)) {
+		userToAdd.id = generateId();
+	}
 	addUser(userToAdd);
+
+	// just added this line for 201 requirement
+	res.status(201).send("Content Created");
 	res.send();
 });
 
