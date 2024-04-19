@@ -38,16 +38,16 @@ const addUser = (user) => {
 	return user;
 };
 
-const findUserByName = (name) => {
-	return users["users_list"].filter(
-	(user) => user["name"] === name
-	);
-};
+// const findUserByName = (name) => {
+// 	return users["users_list"].filter(
+// 	(user) => user["name"] === name
+// 	);
+// };
 
-const findUserByJob = (job) => {
-	return users["users_list"].filter(
-	(user) => (user.job === job));
-};
+// const findUserByJob = (job) => {
+// 	return users["users_list"].filter(
+// 	(user) => (user.job === job));
+// };
 
 const findUserByNameJob = (name, job) => {
 	return users["users_list"].filter(
@@ -108,28 +108,42 @@ app.get("/users", (req, res) => {
 
 app.post("/users", (req, res) => {
 	const userToAdd = req.body;
-	if (!("id" in userToAdd)) {
+	if ("id" in userToAdd) {
+		addUser(userToAdd);
+	} else {
 		userToAdd.id = generateId();
+		addUser(userToAdd);
 	}
-	addUser(userToAdd);
 
 	// just added this line for 201 requirement
-	res.status(201).send("Content Created");
-	res.send();
+	// and the additional returning the updated representation
+	res.status(201).send(userToAdd);
 });
 
 
 const findUserIndexById = (id) =>
   users.users_list.findIndex(user => user.id === id);
 
-
-app.delete("/users/:id", (req, res) => {
-  const id = req.params.id;
-  const index = findUserIndexById(id);
-  if (index !== -1) {
+  
+  app.delete("/users/:id", (req, res) => {
+	const id = req.params.id;
+	const index = findUserIndexById(id);
+	if (index !== -1) {
 	  users.users_list.splice(index, 1);
-	  res.send("User deleted successfully");
-  } else {
-	  res.status(404).send("User not found");
-  }
-});
+	  res.sendStatus(204); // Successful deletion, no content to return
+	} else {
+	  res.sendStatus(404); // Resource not found
+	}
+  });
+
+// app.delete("/users/:id", (req, res) => {
+// 	const id = req.params.id;
+// 	const index = findUserIndexById(id);
+// 	if (index !== -1) {
+// 		const updatedUsersList = users.users_list.filter(user => user.id !== id);
+// 		users.users_list = updatedUsersList;
+// 		res.status(204).send("User deleted successfully");
+//   } else {
+// 	  res.status(404).send("User not found");
+//   }
+// });
