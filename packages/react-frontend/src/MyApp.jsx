@@ -7,32 +7,60 @@ function MyApp() {
   const [characters, setCharacters] = useState([]);
 
   
+  // function fetchUsers() {
+  //   const promise = fetch("http://localhost:8000/users")
+  //     .then((json) => setCharacters(json.users_list))
+  //     .catch((error) => {
+  //       console.log(error);
+  //     });
+  //     return promise;
+  // }
+
   function fetchUsers() {
-    const promise = fetch("http://localhost:8000/users")
-      .then((res) => res.json())
-      .then((json) => setCharacters(json.users_list))
+    return fetch("http://localhost:8000/users")
+      .then((res) => {
+        console.log("Response status:", res.status);
+        return res.json();
+      })
+      .then((data) => {
+        console.log("Response data:", data);
+        if (!Array.isArray(data)) {
+          throw new Error("Invalid response data");
+        }
+        return data;
+      })
       .catch((error) => {
-        console.log(error);
+        console.error("Error fetching users:", error);
+        throw error;
       });
-    return promise;
   }
 
   useEffect(() => {
     fetchUsers()
-      .then((res) => res.json())
-      .then((json) => setCharacters(json["users_list"]))
-      .catch((error) => { console.log(error); });
-  }, [] );
+      .then((usersList) => {
+        setCharacters(usersList);
+      })
+      .catch((error) => {
+        console.error("Error setting characters:", error);
+      });
+  }, []);
+
+  // useEffect(() => {
+  //   fetchUsers()
+  //     .then((res) => res.json())
+  //     .then((json) => setCharacters(json["users_list"]))
+  //     .catch((error) => { console.log(error); });
+  // }, [] );
 
 
-  function removeOneCharacter(id) {
-    fetch(`http://localhost:8000/users/${id}`, {
+  function removeOneCharacter(_id) {
+    fetch(`http://localhost:8000/users/${_id}`, {
       method: "DELETE"
     })
     .then((res) => {
       if (res.status === 204) {
         // Successful deletion, update frontend
-        setCharacters(characters.filter(character => character.id !== id));
+        setCharacters(characters.filter(character => character._id !== _id));
       } else if (res.status === 404) {
         // Resource not found, handle error if needed
       }
@@ -43,7 +71,7 @@ function MyApp() {
   }
 
   function postUser(person) {
-    const promise = fetch("Http://localhost:8000/users", {
+    const promise = fetch("http://localhost:8000/users", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -54,12 +82,26 @@ function MyApp() {
     return promise;
   }
 
+  // function updateList(person) { 
+  //   postUser(person)
+  //     .then(() => {
+  //       setCharacters(prevCharacters => [...prevCharacters, person]);
+  //     })
+  //     .catch((error) => {
+  //       console.log(error);
+  //     })
+  // }
+  
   function updateList(person) { 
     postUser(person)
-      .then(() => setCharacters([...characters, person]))
+      .then(response => response.json()) // Parse the response body as JSON
+      .then(newUser => {
+        // Update characters state with the new user including its _id
+        setCharacters(prevCharacters => [...prevCharacters, newUser]);
+      })
       .catch((error) => {
         console.log(error);
-      })
+      });
   }
 
   return (
