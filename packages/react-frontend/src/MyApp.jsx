@@ -6,16 +6,6 @@ import Form from "./Form";
 function MyApp() {
   const [characters, setCharacters] = useState([]);
 
-  
-  // function fetchUsers() {
-  //   const promise = fetch("http://localhost:8000/users")
-  //     .then((json) => setCharacters(json.users_list))
-  //     .catch((error) => {
-  //       console.log(error);
-  //     });
-  //     return promise;
-  // }
-
   function fetchUsers() {
     return fetch("http://localhost:8000/users")
       .then((res) => {

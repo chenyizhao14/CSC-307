@@ -80,38 +80,14 @@ app.get("/users", (req, res) => {
 			.catch(error => {
 				res.status(500).send("Error in server " + error);
 		});
-	} else if (name !== undefined ){
-		Users.getUsers(name)
+	} else {
+		Users.getUsers(name, job)
 			.then(result => {
 				res.send({result});
 			})
 			.catch(error => {
 				res.status(500).send("Error in name search " + error);
 			});
-	} else if (job !== undefined) {
-		Users.getUsers(null, job)
-			.then (result => {
-				res.send({result});
-			})
-			.catch(err => {
-				res.status(500).send('Error in job search '+ err );
-	});
-		// promise = userModel.find()
-		// Users.getUsers(name, job)
-		// 	.then(result => {
-		// 		res.send({result});
-		// 	})
-		// 	.catch(error =>{
-		// 		console.log(error);
-		// 	});
-	} else {
-		Users.getUsers()
-			.then(result => {
-				res.send(result);
-			})
-			.catch(error =>{
-				res.status(500).send("Error in fetching all users:" + error);
-			})
 		}
 });
 
